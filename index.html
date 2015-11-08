@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <!-- Meta-Information -->
+    <!-- etc… -->
+    <!-- Vendor: Bootstrap Stylesheets http://getbootstrap.com -->
+    <!-- etc… -->
+    <!-- Our Website CSS Styles -->
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet"
+        type="text/css" />
+    <link href="content/css/sidebar.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="content/css/main.css">
+</head>
+<body ng-app="tonyapp">
+    <!--[if lt IE 7]>
+<!-- etc… -->
+    <![endif]-->
+    <div id="wrapper">
+        <div ng-include='"src/app/navigation/sidebar.html"' ng-if="showNavigators">
+        </div>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                         <span href="#menu-toggle" class="btn btn-default" id="menu-toggle" ng-if="showNavigators"><<>></span>
+                        <div ng-view>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+        <div ng-include='"src/app/navigation/footer.html"' ng-if="showNavigators">
+        </div>
+    </div>
+    <!-- /#wrapper -->
+    <!-- Vendor: Javascripts -->
+    <!-- etc… -->
+    <span class="highlight">
+        <!-- Vendor: Angular, followed by our custom Javascripts -->
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular-route.min.js"></script>
+        <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+        <script src="bower_components/Heyoffline/heyoffline.js"></script>
+    </span>
+    <!-- Our Website Javascripts -->
+    <script src="src/app/app.run.js" type="text/javascript"></script>
+    <script src="src/app/app.module.js"></script>
+    <script src="src/app/login/login.module.js" type="text/javascript"></script>
+    <script src="src/app/login/loginCtrl.js" type="text/javascript"></script>
+    <script src="src/app/home/dashboard.module.js" type="text/javascript"></script>
+    <script src="src/app/ourservices/ourservices.module.js"></script>
+    <script src="src/app/pricing/pricing.module.js"></script>
+    <script src="src/app/about/about.module.js"></script>
+    <script src="src/app/main.js"></script>
+</body>
+</html>
