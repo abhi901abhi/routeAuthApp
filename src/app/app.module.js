@@ -1,14 +1,22 @@
 (function () {
     angular.module('tonyapp', [
-    //external
+     //external
     'ngRoute',
+    'blockUI',
     //application level
     'tonyapp.run',
     'tonyapp.login',
     'tonyapp.dashboard',
     'tonyapp.ourservices',
     'tonyapp.pricing',
-    'tonyapp.about'
+    'tonyapp.about',
+    'tonyapp.pq',
+
+    //common 
+    'tonyapp.configs',
+    'tonyapp.services'
+
+   
     ]);
 
 })();

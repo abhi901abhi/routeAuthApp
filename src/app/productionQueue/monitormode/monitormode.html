@@ -1,0 +1,135 @@
+﻿<div class="col-xs-6">
+    <h3 class="sub-header">
+        Current Status
+        <button class="btn btn-primary" ng-click="getPrductionLinesData()">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+    </h3>
+    <div class="table-responsive">
+        <center>
+            <div class="progress progress-striped" ng-hide="progHide" style="width: 50%;">
+                <div class="progress-bar progress-bar-info" style="width: {{progWidth}}%">
+                    Recieved: {{progWidth}}%
+                </div>
+            </div>
+        </center>
+        <table class="table table-striped">
+            <thead>
+                <tr ng-repeat="productinLine in queues.data |limitTo:1">
+                    <th class="col-md-1">
+                        #
+                    </th>
+                    <th class="col-md-2">
+                        Line
+                    </th>
+                    <th class="col-md-2">
+                        Queue
+                    </th>
+                    <th class="col-md-2" data-ng-repeat="phase in productinLine.phases" ng-if="phase.enabledInProductionQueue">
+                        {{phase.code}}
+                    </th>
+                    <th class="col-md-3">
+                        Over Flow
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="productinLine in queues.data track by $index">
+                    <td>
+                        {{$index+1}}
+                    </td>
+                    <td>
+                        {{productinLine.lineName}}
+                    </td>
+                    <td>
+                        {{productinLine.jobsInQueue}}
+                    </td>
+                    <td ng-repeat="phase in productinLine.phases" ng-if="phase.enabledInProductionQueue">
+                        {{phase.noOfJobs}}
+                    </td>
+                    <td>
+                        {{productinLine.overFlow}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="col-xs-6">
+    <h2 class="sub-header">
+        Latest Incidents</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th class="col-md-1">
+                        #
+                    </th>
+                    <th class="col-md-2">
+                        Header
+                    </th>
+                    <th class="col-md-3">
+                        Header
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-md-1">
+                        1,001
+                    </td>
+                    <td class="col-md-2">
+                        1,001
+                    </td>
+                    <td class="col-md-3">
+                        1,001
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-1">
+                        1,001
+                    </td>
+                    <td class="col-md-2">
+                        1,001
+                    </td>
+                    <td class="col-md-3">
+                        1,001
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-1">
+                        1,001
+                    </td>
+                    <td class="col-md-2">
+                        1,001
+                    </td>
+                    <td class="col-md-3">
+                        1,001
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+<div class="col-xs-12">
+<div class="alert alert-info" ng-repeat="message in messages">
+  <p>{{message.time}}</p>
+  <strong>{{message.text}}</strong>
+</div>
+</div>
+
+
+<div class="col-xs-6">
+    <pre>
+    newVal={{nnnn|json}}
+</pre>
+</div>
+<div class="col-xs-6">
+    <pre>
+   oldVal= {{oooo|json}}
+</pre>
+</div>
