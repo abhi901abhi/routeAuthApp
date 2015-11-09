@@ -2,111 +2,127 @@
 
     angular.module('tonyapp.monitormode').controller('monitormodeCtrl', monitormodeCtrl);
 
-    function monitormodeCtrl($scope, $window, $timeout, $location, productionQueueService, blockUI) {
+    function monitormodeCtrl($scope, $window, $timeout, $interval, $location, $sce, productionQueueService, blockUI) {
+
+
+        var jobsEnteredIntoTheQueue = ' New jobs enetered into queue ';
+        var jobsReleasedFromTheQueue = ' jobs released from the queue ';
+
+        $scope.pollingIntervalFrequency = 5000;
+        //log messages
+        $scope.messages = [];
+
+        $scope.enableLog = true;
+
+        // store the interval promise in this variable
+        var promiseFromIntervel;
+
+        // Data Bucket
         $scope.queues = {
             data: []
         };
-        $scope.messages = [];
 
-
-
-        $scope.$watch('queues.data', function (newVal, oldVal) {
-
-
-            $scope.nnnn = newVal;
-            $scope.oooo = oldVal;
-
-            if (oldVal.length != 0 && newVal.length != 0) {
-                for (var i = 0; i < newVal.length; i++) {
-                    var newItem = newVal[i];
-                    var oldItem = oldVal[i];
-
-                    if (newItem.lineName == oldItem.lineName) {
-                        if (newItem.jobsInQueue != oldItem.jobsInQueue) {
-                            var difference = newItem.jobsInQueue - oldItem.jobsInQueue;
-                            if (difference > 0) {
-                                var message = {
-                                    time: new Date() + " UTC",
-                                    text: newItem.lineName + ' : ' + difference + ' New jobs enetered into queue '
-                                };
-                            }
-                            else {
-                                var message = {
-                                    time: new Date() + " UTC",
-                                    text: newItem.lineName + ' : ' + Math.abs(difference) + ' jobs released from the queue '
-                                };
-                            }
-                            $scope.messages.splice(0, 0, message);
-                        }
-                    }
-                }
-            }
-
-
-
-        });
-
-
-        var timeOutPromise;
-
-        (function tick() {
-            var promise = productionQueueService.getLinesData();
-            promise.then(function (response) {
-                $scope.queues.data = response;
-                timeOutPromise = $timeout(tick, 5000);
-                var message = {
-                    time: new Date() + " UTC",
-                    text: 'Data Refreshed'
-                };
-                console.log('data refreshed');
-                $scope.messages.splice(0, 0, message);
-            });
-        })();
-
-        // Cancel interval on page changes
-        $scope.$on('$destroy', function () {
-            if (angular.isDefined(timeOutPromise)) {
-                $timeout.cancel(timeOutPromise);
-                timeOutPromise = undefined;
-            }
-        });
-
-
-        $scope.getPrductionLinesData = function () {
-            //var myBlock = blockUI.instances.get('myLinesTable');
-            //myBlock.start("Loading Queues");
+        function fetchProductionLinesDataSnapShot() {
+            $scope.progWidth = 50;
             $scope.progHide = false;
-            $scope.progWidth = 20;
-            $timeout(function () {
-                $scope.progWidth = 50;
-            }, 500);
-            $timeout(function () {
-                $scope.progWidth = 70;
-            }, 1000);
+
+
             var promise = productionQueueService.getLinesData();
+            logIt('Called Server');
+
             promise.then(function (response) {
-                $timeout(function () {
-                    $scope.progWidth = 82;
-                }, 1500);
-                $timeout(function () {
-                    $scope.progWidth = 100;
-                }, 2000);
+                logIt('Recieved Data From Server');
+                $timeout(function () { $scope.progWidth = 75; }, 500);
+                $timeout(function () { $scope.progWidth = 100; }, 1000);
                 $timeout(function () {
                     $scope.queues.data = response;
                     $scope.progHide = true;
-                }, 2100);
+                }, 1500);
 
-                // myBlock.stop();
+
             });
-
-            //            myBlock.done(function () {
-
-            //            });
 
         }
 
-        $scope.getPrductionLinesData();
-    }
+        // starts the interval
+        $scope.startPolling = function () {
+            $scope.progWidth = 10;
+
+            // stops any running interval to avoid two intervals running at the same time
+            $scope.stopPolling();
+
+            // store the interval promise
+            promiseFromIntervel = $interval(fetchProductionLinesDataSnapShot, $scope.pollingIntervalFrequency);
+            logIt('started polling');
+        };
+
+        // stops the interval
+        $scope.stopPolling = function () {
+            $interval.cancel(promiseFromIntervel);
+        };
+
+        // starting the interval by default
+        $scope.startPolling();
+
+
+        //Watch the change in Production Lines Data Snapshot - Start
+        $scope.$watch('queues.data', function (newVal, oldVal) {
+            $scope.nnnn = newVal;
+            $scope.oooo = oldVal;
+            if ($scope.enableLog) {
+                if (oldVal.length != 0 && newVal.length != 0) {
+                    for (var i = 0; i < newVal.length; i++) {
+                        var newItem = newVal[i];
+                        var oldItem = oldVal[i];
+                        snapShotsGapAnalysis(newItem, oldItem);
+                    }
+                }
+            }  // end of if enableLog
+        });
+        //Watch the change in Production Lines Data Snapshot - End
+
+        // stops the interval when the scope is destroyed,
+        $scope.$on('$destroy', function () {
+            $scope.stopPolling();
+        });
+
+
+        function snapShotsGapAnalysis(newItem, oldItem) {
+            if (newItem.lineName == oldItem.lineName) {
+                if (newItem.jobsInQueue != oldItem.jobsInQueue) {
+                    var difference = newItem.jobsInQueue - oldItem.jobsInQueue;
+                    var message = {};
+                    if (difference > 0) {
+                        message = newItem.lineName + ' : ' + difference + jobsEnteredIntoTheQueue;
+                    }
+                    else {
+                        message = newItem.lineName + ' : ' + Math.abs(difference) + jobsReleasedFromTheQueue;
+                    }
+                    //Insert the log message at 0th index
+                    logIt(message);
+                }
+            }
+        } //end of snapShotsGapAnalysis
+
+        $scope.runLog = function () {
+            $scope.enableLog = true;
+            var playBtn = $sce.trustAsHtml('<span class="glyphicon glyphicon-play"></span>');
+            logIt('Logs Started ' + playBtn);
+        };
+        $scope.pauseLog = function () {
+            var pauseBtn = $sce.trustAsHtml('<span class="glyphicon glyphicon-pause"></span>');
+            logIt('Logs Paused ' + pauseBtn);
+            $scope.enableLog = false;
+        };
+        function logIt(msg) {
+            if ($scope.enableLog) {
+                $scope.messages.splice(0, 0, { time: dateTime(), text: msg });
+            }
+        }
+        function dateTime() {
+            return new Date() + " UTC";
+        }
+    } //End of Controller
 
 })();
 
@@ -152,3 +168,29 @@
 //        overFlow: -950
 //    }]
 //};
+
+
+//        //Polling - start
+//        var timeOutPromise;
+
+//        (function tick() {
+//            var promise = productionQueueService.getLinesData();
+//            promise.then(function (response) {
+//                $scope.queues.data = response;
+//                timeOutPromise = $timeout(tick, 5000);
+//                var message = {
+//                    time: new Date() + " UTC",
+//                    text: 'Data Refreshed'
+//                };
+//                $scope.messages.splice(0, 0, message);
+//            });
+//        })();
+//        //Polling - End
+
+//        // Cancel polling on page changes
+//        $scope.$on('$destroy', function () {
+//            if (angular.isDefined(timeOutPromise)) {
+//                $timeout.cancel(timeOutPromise);
+//                timeOutPromise = undefined;
+//            }
+//        });

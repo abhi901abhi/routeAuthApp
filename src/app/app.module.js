@@ -1,8 +1,10 @@
 (function () {
     angular.module('tonyapp', [
-     //external
+    //external
     'ngRoute',
     'blockUI',
+    'ngSanitize',
+    'ngAnimate',
     //application level
     'tonyapp.run',
     'tonyapp.login',
@@ -16,7 +18,7 @@
     'tonyapp.configs',
     'tonyapp.services'
 
-   
+
     ]);
 
 })();
