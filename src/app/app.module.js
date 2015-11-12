@@ -16,7 +16,9 @@
 
     //common 
     'tonyapp.configs',
+    'tonyapp.directives',
     'tonyapp.services'
+
 
 
     ]);

@@ -16,39 +16,50 @@
 
         // store the interval promise in this variable
         var promiseFromIntervel;
+        var promiseFromProgInterval;
 
         // Data Bucket
         $scope.queues = {
             data: []
         };
 
+        //Reponse from server API
+        var reponseFromServer;
+
+        function progressBarManipulation()
+        {
+            if($scope.progWidth<110)
+            {
+                $scope.progWidth =  $scope.progWidth+10;
+            }
+            else
+            {
+                 $interval.cancel(promiseFromProgInterval); 
+                 $scope.queues.data = reponseFromServer;
+                 $scope.progHide = true;
+            }
+        }
+
         function fetchProductionLinesDataSnapShot() {
-            $scope.progWidth = 50;
-            $scope.progHide = false;
-
-
+            
             var promise = productionQueueService.getLinesData();
             logIt('Called Server');
 
             promise.then(function (response) {
                 logIt('Recieved Data From Server');
-                $timeout(function () { $scope.progWidth = 75; }, 500);
-                $timeout(function () { $scope.progWidth = 100; }, 1000);
-                $timeout(function () {
-                    $scope.queues.data = response;
-                    $scope.progHide = true;
-                }, 1500);
-
-
+                 $scope.progHide = false;
+                 $scope.progWidth=1;
+                 reponseFromServer=response;
+                promiseFromProgInterval= $interval(progressBarManipulation, 200);          
             });
 
         }
 
-        // starts the interval
+        // start the interval
         $scope.startPolling = function () {
             $scope.progWidth = 10;
 
-            // stops any running interval to avoid two intervals running at the same time
+            // stop running interval if any to avoid two intervals running at same time
             $scope.stopPolling();
 
             // store the interval promise
@@ -56,12 +67,12 @@
             logIt('started polling');
         };
 
-        // stops the interval
+        // stop the interval
         $scope.stopPolling = function () {
             $interval.cancel(promiseFromIntervel);
         };
 
-        // starting the interval by default
+        // start the interval by default
         $scope.startPolling();
 
 
@@ -117,6 +128,7 @@
         function logIt(msg) {
             if ($scope.enableLog) {
                 $scope.messages.splice(0, 0, { time: dateTime(), text: msg });
+                console.log(msg);
             }
         }
         function dateTime() {
