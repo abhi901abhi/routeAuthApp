@@ -50,7 +50,7 @@
                  $scope.progHide = false;
                  $scope.progWidth=1;
                  reponseFromServer=response;
-                promiseFromProgInterval= $interval(progressBarManipulation, 200);          
+                promiseFromProgInterval= $interval(progressBarManipulation, 500);          
             });
 
         }
